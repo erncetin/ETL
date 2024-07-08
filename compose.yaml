@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres_db
+    ports:
+      - "5432:5432"
+
+  python-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    volumes:
+      - ./ETL_script.py:/app/ETL_script.py  
+    restart: always
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: postgres_db
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
