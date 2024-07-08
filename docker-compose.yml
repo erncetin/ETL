@@ -1,7 +1,6 @@
 version: '3.9'
 
 services:
-
   db:
     container_name: postgres_container
     image: postgres
@@ -9,21 +8,27 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: postgres_db
+      POSTGRES_DB: test_db
     ports:
-      - "5432:5432"
+      - "5431:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   python-app:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./ETL_script.py:/app/ETL_script.py  
     restart: always
     environment:
       DATABASE_HOST: db
-      DATABASE_NAME: postgres_db
+      DATABASE_NAME: test_db
       DATABASE_USER: root
       DATABASE_PASSWORD: root

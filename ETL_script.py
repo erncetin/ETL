@@ -1,13 +1,24 @@
 import psycopg2
+import time
+RETRY_ATTEMPTS = 20
+RETRY_DELAY = 5  # in seconds
 
-conn = psycopg2.connect(
-    host="localhost",
-    database="postgres_db",
-    user="root",
-    password="root"
-)
-
-cursor = conn.cursor()
+for attempt in range(RETRY_ATTEMPTS):
+    try:
+        db = psycopg2.connect(
+            host="db",
+            port="5432", 
+            database="test_db",
+            user="root",
+            password="root"
+        )
+        break
+    except psycopg2.OperationalError as e:
+        print(f"Attempt {attempt + 1} failed: {e}")
+        time.sleep(RETRY_DELAY)
+else:
+    print("All attempts to connect to the database failed.")
+    exit(1)
 
 create_table_queries = [
     """
@@ -16,25 +27,27 @@ create_table_queries = [
         isim VARCHAR(255),
         soyisim VARCHAR(255),
         dateofbirth DATE
-    )
+    );
     """,
     """
     CREATE TABLE IF NOT EXISTS table2 (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255),
         yas INTEGER
-    )
+    );
     """,
     """
-    CREATE TABLE IF NOT EXIST table3 (
+    CREATE TABLE IF NOT EXISTS table3 (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
     username VARCHAR(255)
-    )
+    );
     
     """
 ]
-for query in create_table_queries:
-    cursor.execute(query)
-
-    
+with db.cursor() as cursor:
+    for query in create_table_queries:
+        try:
+            cursor.execute(query)
+        except psycopg2.Error as e:
+            print(e)
