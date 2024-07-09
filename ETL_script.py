@@ -121,7 +121,8 @@ with db_postgres.cursor() as cursor:
         print(f"DATABASE ERROR: {e} ")
 
 #Fetching data from postgresql and loading into mysql
-with db_postgres.cursor() as postgres_cursor: 
+with db_postgres.cursor(name="fetching_big_data") as postgres_cursor: 
+    cursor.itersize = 50
     try:
         postgres_cursor.execute('''SELECT isim, soyisim, dateofbirth FROM table1
             ''')
@@ -137,7 +138,8 @@ with db_postgres.cursor() as postgres_cursor:
          print(f"postgres error {e}")
     
 #Fetching data from postgresql and loading into mysql
-with db_postgres.cursor() as postgres_cursor: 
+with db_postgres.cursor(name= "fetching_big_data") as postgres_cursor: 
+    cursor.itersize = 50
     try:
         postgres_cursor.execute('''SELECT email, yas FROM table2
             ''')
@@ -153,7 +155,8 @@ with db_postgres.cursor() as postgres_cursor:
          print(f"postgres error {e}")
 
 #Fetching data from postgresql and loading into mysql
-with db_postgres.cursor() as postgres_cursor: 
+with db_postgres.cursor(name="fetching_big_data") as postgres_cursor: 
+    cursor.itersize = 50
     try:
         postgres_cursor.execute('''SELECT name, age, dateofbirth FROM table3
             ''')
