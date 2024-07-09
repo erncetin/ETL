@@ -170,7 +170,26 @@ with db_postgres.cursor() as postgres_cursor:
 
 
 #validation of the data
- 
+with db_postgres.cursor() as postgres_cursor, db_mysql.cursor() as mysql_cursor:
+    postgres_cursor.execute('''SELECT isim, soyisim, dateofbirth FROM table1 ''')
+    mysql_cursor.execute('''SELECT isim, soyisim, dateofbirth FROM table1 ''')
+    if mysql_cursor.fetchall() == postgres_cursor.fetchall():
+        print("TABLE1 IDENTICAL")
+    else:
+        print("TABLE1 IS NOT IDENTICAL")
+    postgres_cursor.execute('''SELECT email, yas FROM table2 ''')
+    mysql_cursor.execute('''SELECT email, yas FROM table2 ''')
+    if mysql_cursor.fetchall() == postgres_cursor.fetchall():
+        print("TABLE2 IDENTICAL")
+    else:
+        print("TABLE2 IS NOT IDENTICAL")
+
+    postgres_cursor.execute('''SELECT name, age, dateofbirth FROM table3 ''')
+    mysql_cursor.execute('''SELECT name, age, dateofbirth FROM table3 ''')
+    if mysql_cursor.fetchall() == postgres_cursor.fetchall():
+        print("TABLE2 IDENTICAL")
+    else:
+        print("TABLE2 IS NOT IDENTICAL")
 
 db_postgres.close()
 db_mysql.close()
