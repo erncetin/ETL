@@ -4,11 +4,8 @@ from time import time
 from datetime import datetime
 
 fake = Faker()
-RETRY_ATTEMPTS = 2
-RETRY_DELAY = 5
 
-for attempt in range(RETRY_ATTEMPTS):
-    try:
+try:
         db = psycopg2.connect(
             database = "test_db",
             user = "root",
@@ -17,13 +14,9 @@ for attempt in range(RETRY_ATTEMPTS):
             port = "5432"
         )
         print("BAGLANDI")
-        break
-    except psycopg2.OperationalError as e:
-        print(f"Attempt {attempt + 1} failed: {e}")
-        time.sleep(RETRY_DELAY)
-else:
-    print("All attempts to connect to the database failed.")
-    exit(1)
+except psycopg2.OperationalError as e:
+        print(f"failed to connect to database: {e}")
+
 
 create_table_queries = [
     """
@@ -61,8 +54,6 @@ with db.cursor() as cursor:
         except psycopg2.Error as e:
             db.rollback()
             print(f"Error executing query: {e}")
-
-
 
 name_list = [fake.first_name() for _ in range(100)]
 surname_list = [fake.last_name() for _ in range(100)]
