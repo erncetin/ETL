@@ -1,2 +1,4 @@
 psycopg2-binary
 faker>=18.9.0
+mysql-connector-python
+

@@ -1,20 +1,35 @@
 version: '3.9'
 
 services:
-  db:
+  host_postgres:
     container_name: postgres_container
     image: postgres
     restart: always
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: test_db
+      POSTGRES_DB: db_postgres
     ports:
       - "5431:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
+      interval: 2s
+      timeout: 1s
+      retries: 2
+
+  host_mysql:
+    container_name: mysql_container
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      interval: 5s
+      timeout: 2s
       retries: 2
 
   python-app:
@@ -22,15 +37,20 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      db:
+      host_postgres:
+        condition: service_healthy
+      host_mysql:
         condition: service_healthy
     volumes:
       - ./ETL_script.py:/app/ETL_script.py  
     command: ["python", "/app/ETL_script.py"]
     environment:
-      DATABASE_HOST: db
-      DATABASE_NAME: test_db 
-      DATABASE_USER: root
-      DATABASE_PASSWORD: root
+      POSTGRES_HOST: host_postgres
+      POSTGRES_DB: db_postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      MYSQL_HOST: host_mysql
+      MYSQL_DB: db_mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     restart: "no"
-    

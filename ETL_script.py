@@ -1,24 +1,36 @@
 import psycopg2
 from faker import Faker
-from time import time
 from datetime import datetime
-
+import mysql.connector
 fake = Faker()
 
 try:
-        db = psycopg2.connect(
-            database = "test_db",
+        db_postgres = psycopg2.connect(
+            database = "db_postgres",
             user = "root",
             password = "root",
-            host = "db",
+            host = "host_postgres",
             port = "5432"
         )
-        print("BAGLANDI")
-except psycopg2.OperationalError as e:
+        print("POSTGRES BAGLANDI")
+except psycopg2.Error as e:
         print(f"failed to connect to database: {e}")
 
+try:
+    db_mysql = mysql.connector.connect(
+    host="host_mysql",
+    user="root",
+    password="root",
+    database="db_mysql",
+    port= "3306"
+    )
+    print("MYSQL BAGLANDI")
 
-create_table_queries = [
+except mysql.connector.Error as e:
+     print(f"MYSQL DATABASE ERROR: {e}")
+
+
+create_table_queries = [#queries for postgres database
     """
     CREATE TABLE IF NOT EXISTS table1 (
         id SERIAL PRIMARY KEY,
@@ -44,24 +56,35 @@ create_table_queries = [
     );
     """
 ]
-
-with db.cursor() as cursor:
+with db_postgres.cursor() as cursor:
     for query in create_table_queries:
         try:
             cursor.execute(query)
-            print(f"Executed query: {query}")
-            db.commit()
+            print("creating table in postgreSQL database")
+            db_postgres.commit()
         except psycopg2.Error as e:
-            db.rollback()
-            print(f"Error executing query: {e}")
+            print(f"error while creating tables for POSTGRESQL database: {e}")#commit the queries for postgres database
+
+with db_mysql.cursor() as cursor:
+    for query in create_table_queries:
+        try:
+            cursor.execute(query)
+            print("creating table in MYSQL database")
+        except mysql.connector.Error as e:
+             print(f"error while creating tables for MYSQL database: {e}")#commit the queries for mysql database
+          
+
+
 
 name_list = [fake.first_name() for _ in range(100)]
 surname_list = [fake.last_name() for _ in range(100)]
 email_list = [fake.email() for _ in range(100)]
 date_of_birth_list = [str(fake.date_of_birth(minimum_age=18, maximum_age=90)) for _ in range(100)]
-age_list = [2024 - datetime.strptime(date_of_birth_list[i], "%Y-%m-%d").year for i in range(100)]
+age_list = [2024 - datetime.strptime(date_of_birth_list[i], "%Y-%m-%d").year for i in range(100)]# dummy schema
 
-with db.cursor() as cursor:
+
+
+with db_postgres.cursor() as cursor:
     try:
         for i in range(100):
             cursor.execute('''INSERT INTO table1 (isim, soyisim, dateofbirth) VALUES (%s, %s, %s)                
@@ -70,11 +93,11 @@ with db.cursor() as cursor:
                 ''',(email_list[i], age_list[i]))
             cursor.execute('''INSERT INTO table3 (name, age, dateofbirth) VALUES (%s, %s, %s)                
                 ''',(name_list[i], age_list[i], date_of_birth_list[i]))
-        db.commit()
+        db_postgres.commit()
     except psycopg2.Error as e:
-        db.rollback()
+        db_postgres.rollback()
         print(f"DATABASE ERROR: {e} ")
 
 
 
-db.close()
+db_postgres.close()
