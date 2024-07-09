@@ -1,7 +1,6 @@
 import psycopg2
-import time
 
-RETRY_ATTEMPTS = 20
+RETRY_ATTEMPTS = 2
 RETRY_DELAY = 5
 
 for attempt in range(RETRY_ATTEMPTS):
@@ -52,8 +51,15 @@ with db.cursor() as cursor:
         try:
             cursor.execute(query)
             print(f"Executed query: {query}")
+            db.commit()
         except psycopg2.Error as e:
             print(f"Error executing query: {e}")
 
-db.commit()  # Ensure changes are committed
-db.close()  # Close the connection
+
+
+
+
+
+
+
+db.close()

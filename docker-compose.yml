@@ -15,7 +15,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 2
 
   python-app:
     build:
@@ -29,6 +29,6 @@ services:
     restart: always
     environment:
       DATABASE_HOST: db
-      DATABASE_NAME: test_db
+      DATABASE_NAME: test_db 
       DATABASE_USER: root
       DATABASE_PASSWORD: root
