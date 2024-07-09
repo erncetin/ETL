@@ -26,9 +26,11 @@ services:
         condition: service_healthy
     volumes:
       - ./ETL_script.py:/app/ETL_script.py  
-    restart: always
+    command: ["python", "/app/ETL_script.py"]
     environment:
       DATABASE_HOST: db
       DATABASE_NAME: test_db 
       DATABASE_USER: root
       DATABASE_PASSWORD: root
+    restart: "no"
+    

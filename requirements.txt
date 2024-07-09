@@ -1,2 +1,2 @@
 psycopg2-binary
-faker
+faker>=18.9.0
