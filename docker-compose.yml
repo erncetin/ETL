@@ -4,7 +4,6 @@ services:
   host_postgres:
     container_name: postgres_container
     image: postgres
-    restart: always
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
@@ -20,7 +19,6 @@ services:
   host_mysql:
     container_name: mysql_container
     image: mysql
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_mysql
@@ -53,4 +51,3 @@ services:
       MYSQL_DB: db_mysql
       MYSQL_USER: root
       MYSQL_PASSWORD: root
-    restart: "no"
